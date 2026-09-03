@@ -1,11 +1,11 @@
 [dev]
 node1.lab.example.com
 
-[test]
-node2.lab.example.com
+#[test]
+#node2.lab.example.com
 
-[prod]
-node3.lab.example.com
+#[prod]
+#node3.lab.example.com
 
 [webservers:children]
-prod
+dev
