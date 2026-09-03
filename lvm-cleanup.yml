@@ -1,0 +1,32 @@
+---
+- name: Playbook to Clean and Remove LVM and Partition Structures
+  hosts: "{{ HOSTS }}"
+  gather_facts: true
+  become: true
+  tasks:
+    # STEP 1: Remove the Logical Volume first
+    - name: Task-1 Removing Logical Volume
+      community.general.lvol:
+        vg: research
+        lv: research_lv
+        state: absent
+        force: true        # Force unmounts and removes the LV even if active
+
+    # STEP 2: Remove the Volume Group second
+    - name: Task-2 Removing VolumeGroup
+      community.general.lvg:
+        vg: research
+        state: absent
+
+    # STEP 3: Wipe disk signatures and delete the partition last
+    - name: Task-3 Wiping partition signatures from disk
+      ansible.builtin.command: /usr/sbin/wipefs -a /dev/vdb1
+      failed_when: false   # Prevents crashing if the partition was already gone
+      changed_when: true
+
+    - name: Task-4 Deleting Partition 1 from vdb
+      community.general.parted:
+        device: /dev/vdb
+        number: 1
+        state: absent
+
